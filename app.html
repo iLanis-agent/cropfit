@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CropFit - Will my photo print sharp?</title>
+<style>
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { font-family:-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif; background:#1b1722; color:#f1ecf7; line-height:1.5; }
+  .wrap { max-width:660px; margin:0 auto; padding:26px 18px 60px; }
+  a { color:#c9a7ff; } h1 { font-size:28px; } h1 span { color:#c9a7ff; } .sub { color:#a99fb8; margin:4px 0 18px; }
+  .card { background:#272032; border-radius:14px; padding:16px; margin-bottom:14px; }
+  label { display:block; font-size:13px; color:#a99fb8; margin:10px 0 4px; }
+  .row { display:flex; gap:10px; } .row > div { flex:1; }
+  input, select { width:100%; padding:11px; border-radius:9px; border:1px solid #4a3f5c; background:#1b1722; color:#f1ecf7; font-size:16px; font-family:inherit; }
+  input.bad { border-color:#e0746a; }
+  .big { font-size:46px; font-weight:800; color:#c9a7ff; } .lbl { font-size:13px; color:#a99fb8; }
+  .grid { display:flex; gap:12px; flex-wrap:wrap; margin-top:12px; } .grid > div { flex:1; min-width:130px; background:#1b1722; border-radius:10px; padding:10px; } .grid b { display:block; font-size:20px; }
+  table { width:100%; border-collapse:collapse; margin-top:8px; } td, th { padding:8px 4px; border-top:1px solid #3a3049; font-size:14px; text-align:right; } th { color:#a99fb8; font-weight:600; } td:first-child, th:first-child { text-align:left; }
+  .good { color:#7be3a6; } .meh { color:#ffd479; } .poor { color:#ff8a7e; } .note { font-size:14px; color:#ddd5e8; margin-top:10px; } h2 { font-size:17px; margin-bottom:8px; } .small { font-size:13px; color:#a99fb8; }
+  .warn { background:#3d2a20; border:1px solid #b9703f; color:#ffddc4; padding:12px; border-radius:10px; margin-top:12px; font-size:14px; }
+  .vis { margin-top:12px; background:#1b1722; border-radius:10px; padding:12px; text-align:center; } .vis .ph { display:inline-block; position:relative; background:#4a3f5c; } .vis .kp { position:absolute; background:#c9a7ff55; border:2px solid #c9a7ff; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Crop<span>Fit</span></h1>
+  <div class="sub">Enter your photo size in pixels. See how much of it each print size cuts off, and how sharp the print will be.</div>
+  <div class="card">
+    <div class="row"><div><label for="w">Photo width (px)</label><input id="w" inputmode="numeric" value="6000"></div><div><label for="h">Photo height (px)</label><input id="h" inputmode="numeric" value="4000"></div></div>
+    <label for="size">Print size (inches)</label><select id="size"></select>
+  </div>
+  <div class="card" id="out"></div>
+  <div class="card"><h2>About this</h2><div class="small">The print keeps your photo's orientation and fits its shape inside the photo, so the extra edge is cropped. Sharpness is pixels kept divided by print inches. 300 dpi is the common print target (8x10 needs 2400 x 3000 px, <a href="https://pixelsforprint.com/tools/photo-size-print-dimensions-converter/">example</a>); the quality words are rough guidance, not a standard, and they depend on viewing distance. Runs in your browser, nothing is uploaded.</div></div>
+</div>
+<script src="engine.js"></script>
+<script>
+var $ = function (i) { return document.getElementById(i); };
+Object.keys(Crop.SIZES).forEach(function (k) { var o = document.createElement('option'); o.value = k; o.textContent = k + (k[0] === 'A' ? '' : ' in'); $('size').appendChild(o); }); $('size').value = '8x10';
+function val(id) { var v = $(id).value.replace(/[,\s]/g, ''); var ok = /^\d+$/.test(v) && +v >= 10 && +v <= 100000; $(id).className = ok ? '' : 'bad'; return ok ? +v : null; }
+function cls(d) { return d >= 200 ? 'good' : d >= 150 ? 'meh' : 'poor'; }
+function render() {
+  var w = val('w'), h = val('h');
+  if (w == null || h == null) { $('out').innerHTML = '<div class="warn" id="err">Enter whole pixel counts between 10 and 100,000.</div>'; return; }
+  var r = Crop.fit(w, h, Crop.SIZES[$('size').value]), np = Crop.pixelsNeeded([r.printW, r.printH], 300), mp = Crop.megapixels(w, h);
+  var hh = '<div class="lbl">Print sharpness at ' + r.printW + ' x ' + r.printH + ' in</div><div class="big ' + cls(r.dpi) + '" id="dpi">' + Math.round(r.dpi) + ' dpi</div><div class="note" id="q">' + Crop.quality(r.dpi) + '</div>';
+  hh += '<div class="grid"><div><span class="lbl">Cropped away</span><b id="crop">' + (r.cropShare * 100).toFixed(1) + '%</b></div><div><span class="lbl">Cut from</span><b id="cut">' + r.cut + '</b></div><div><span class="lbl">Kept pixels</span><b id="kept">' + Math.round(r.keptW) + ' x ' + Math.round(r.keptH) + '</b></div></div>';
+  var sc = 180 / Math.max(w, h);
+  hh += '<div class="vis"><div class="ph" style="width:' + Math.round(w * sc) + 'px;height:' + Math.round(h * sc) + 'px"><div class="kp" style="left:' + Math.round((w - r.keptW) / 2 * sc) + 'px;top:' + Math.round((h - r.keptH) / 2 * sc) + 'px;width:' + Math.round(r.keptW * sc) + 'px;height:' + Math.round(r.keptH * sc) + 'px"></div></div><div class="small">Your photo, with the printed part outlined (centered crop)</div></div>';
+  if (r.dpi < 300) hh += '<div class="note" id="need">For a fully sharp 300 dpi print you would need ' + np[0] + ' x ' + np[1] + ' px (' + Crop.megapixels(np[0], np[1]).toFixed(1) + ' MP). Your photo is ' + mp.toFixed(1) + ' MP.</div>';
+  hh += '<h2 style="margin-top:18px">Every size for this photo</h2><table id="all"><tr><th>Size</th><th>Cropped</th><th>dpi</th></tr>';
+  Object.keys(Crop.SIZES).forEach(function (k) { var q = Crop.fit(w, h, Crop.SIZES[k]); hh += '<tr><td>' + k + '</td><td>' + (q.cropShare * 100).toFixed(1) + '%</td><td class="' + cls(q.dpi) + '">' + Math.round(q.dpi) + '</td></tr>'; });
+  hh += '</table>';
+  $('out').innerHTML = hh;
+}
+['w', 'h'].forEach(function (id) { $(id).oninput = render; }); $('size').onchange = render;
+render();
+</script>
+</body>
+</html>
