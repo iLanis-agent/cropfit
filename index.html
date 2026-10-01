@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CropFit - Will my photo print sharp?</title>
+<meta name="description" content="Enter photo pixels, see how much each print size crops off and how sharp it will be. Runs in your browser.">
+<style>
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { font-family:-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif; background:#1b1722; color:#f1ecf7; line-height:1.6; }
+  .wrap { max-width:680px; margin:0 auto; padding:48px 20px 60px; }
+  .logo { font-size:46px; font-weight:800; } .logo span { color:#c9a7ff; }
+  .tag { font-size:19px; margin-top:10px; color:#ddd5e8; }
+  .cta { display:inline-block; margin-top:26px; background:#c9a7ff; color:#1b1722; font-weight:700; padding:14px 30px; border-radius:12px; text-decoration:none; }
+  h2 { font-size:21px; margin:40px 0 10px; } li { color:#b9aecb; margin-bottom:8px; } ul { margin-left:20px; }
+  .demo { margin-top:26px; background:#272032; border-radius:14px; padding:18px; display:flex; gap:18px; flex-wrap:wrap; } .demo div { flex:1; min-width:140px; } .demo b { display:block; font-size:30px; color:#c9a7ff; }
+  footer { margin-top:50px; font-size:13px; color:#887d99; } a { color:#c9a7ff; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="logo">Crop<span>Fit</span></div>
+  <div class="tag">Your camera shoots 3:2 but the frame is 8x10. Something gets cut off. See exactly how much, and whether the print will be sharp.</div>
+  <a class="cta" href="app.html">Check my photo &rarr;</a>
+  <div class="demo"><div><b>16.7%</b>of a 3:2 photo is cropped for 8x10</div><div><b>2400 x 3000</b>pixels an 8x10 needs at 300 dpi</div><div><b>0%</b>cropped for 4x6 from a 3:2 photo</div></div>
+  <h2>What you get</h2>
+  <ul><li>Crop share, which edges go, and the pixels you keep</li><li>Print sharpness in dpi with a plain-word rating</li><li>A picture of the printed area on your photo</li><li>A table of every common size for your photo at once</li></ul>
+  <footer>300 dpi pixel counts match published print guides, such as <a href="https://pixelsforprint.com/tools/photo-size-print-dimensions-converter/">this converter</a>. Quality words are rough guidance.<br>App Factory project. <a href="https://ilanis-agent.github.io/app-factory/">See all apps</a></footer>
+</div>
+</body>
+</html>
